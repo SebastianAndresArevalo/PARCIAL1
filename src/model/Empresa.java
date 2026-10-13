@@ -11,14 +11,12 @@ public class Empresa {
     private final Map<String, Paquete> paquetesPorCodigo = new HashMap<>();
     private final Map<String, Repartidor> repartidoresPorId = new HashMap<>();
     private final Queue<Paquete> colaLlegada = new ArrayDeque<>();
-    private final Queue<Paquete> colaPrioridad = new PriorityQueue<>(ORDEN_DESPACHO);
+    private final Queue<Paquete> colaPrioridad = new PriorityQueue<>(Paquete.ORDEN_DESPACHO);
     private final ListaSimple<Paquete> historial = new ListaSimple<>();
-
-    // Cuando se utilice despacho prioritario deberá considerarse primero la prioridad, posteriormente el tiempo estimado y finalmente el código.
-    private static final Comparator<Paquete> ORDEN_DESPACHO = Comparator
-            .comparingInt(Paquete::getPrioridad).reversed()
-            .thenComparingInt(Paquete::getTiempoEstimado)
-            .thenComparing(Paquete::getCodigo);
+    private final Set<String> municipios = new LinkedHashSet<>();
+    private final Map<String, List<Paquete>> paquetesPorMunicipio = new LinkedHashMap<>();
+    private final Map<String, Repartidor> asignaciones = new LinkedHashMap<>();
+    private final SortedSet<String> municipiosOrdenados = new TreeSet<>();
 
 
     //Validación de códigos e identificaciones únicas;
@@ -45,10 +43,33 @@ public class Empresa {
         colaLlegada.offer(paquete);
         colaPrioridad.offer(paquete);
         paquetesPorCodigo.put(paquete.getCodigo(), paquete);
+        municipiosOrdenados.add(paquete.getDestino());
+        municipios.add(paquete.getDestino());
+        paquetesPorMunicipio.computeIfAbsent(paquete.getDestino(), k -> new ArrayList<>()).add(paquete);
     }
 
     public Paquete consultarPaquete(String codigo) {
         return paquetesPorCodigo.get(codigo);
+    }
+
+    public Set<String> obtenerMunicipios() {
+        return Collections.unmodifiableSet(municipios);
+    }
+
+    public List<Paquete> consultarPaquetesPorMunicipio(String municipio) {
+        List<Paquete> paquetes = paquetesPorMunicipio.get(municipio);
+        if (paquetes == null) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(paquetes);
+    }
+
+    public Map<String, List<Paquete>> obtenerPaquetesPorMunicipio() {
+        return Collections.unmodifiableMap(paquetesPorMunicipio);
+    }
+
+    public int cantidadEnEspera() {
+        return colaLlegada.size();
     }
 
     // Cuando se utilice atención por orden de llegada deberá respetarse el orden original de registro.
@@ -81,6 +102,11 @@ public class Empresa {
         colaLlegada.remove(paquete);
         colaPrioridad.remove(paquete);
         historial.agregar(paquete);
+
+        Repartidor repartidor = asignaciones.get(codigoPaquete);
+        if (repartidor != null) {
+            repartidor.setDisponible(true);
+        }
     }
 
     public Paquete obtenerEntrega(int posicion) {
@@ -139,7 +165,9 @@ public class Empresa {
         return repartidoresPorId.get(identificacion);
     }
 
-
+    public SortedSet<String> obtenerMunicipiosOrdenados() {
+        return new TreeSet<>(municipios);
+    }
 
     // Un repartidor no disponible no puede recibir una nueva asignación
     public void asignarPaquete(String codigoPaquete, String identificacionRepartidor) {
@@ -147,28 +175,71 @@ public class Empresa {
         if (paquete == null) {
             throw new IllegalArgumentException("No existe el paquete " + codigoPaquete + ".");
         }
+        if (!pendientes.contains(paquete)) {
+            throw new IllegalStateException("El paquete " + codigoPaquete + " ya fue entregado.");
+        }
+        if (asignaciones.containsKey(codigoPaquete)) {
+            throw new IllegalStateException("El paquete " + codigoPaquete + " ya está asignado al repartidor "
+                    + asignaciones.get(codigoPaquete).getIdentificacion() + ".");
+        }
 
         Repartidor repartidor = consultarRepartidor(identificacionRepartidor);
         if (repartidor == null) {
-            throw new IllegalArgumentException(
-                    "No existe el repartidor " + identificacionRepartidor + ".");
+            throw new IllegalArgumentException("No existe el repartidor " + identificacionRepartidor + ".");
         }
-
         if (!repartidor.isDisponible()) {
-            throw new IllegalStateException(
-                    "El repartidor " + identificacionRepartidor + " no está disponible.");
+            throw new IllegalStateException("El repartidor " + identificacionRepartidor + " no está disponible.");
         }
-
-        // La zona del repartidor debe corresponder al destino del paquete asignado.
         if (!repartidor.getZona().equalsIgnoreCase(paquete.getDestino())) {
             throw new IllegalArgumentException(
                     "La zona del repartidor (" + repartidor.getZona()
                             + ") no corresponde al destino del paquete (" + paquete.getDestino() + ").");
         }
 
+        asignaciones.put(codigoPaquete, repartidor);
         repartidor.setDisponible(false);
+    }
 
-        repartidor.setDisponible(false);
+    public Repartidor consultarRepartidorAsignado(String codigoPaquete) {
+        return asignaciones.get(codigoPaquete);
+    }
+
+    public Map<String, Repartidor> obtenerAsignaciones() {
+        return Collections.unmodifiableMap(asignaciones);
+    }
+
+    // Búsqueda binaria
+
+    public List<Paquete> obtenerPaquetesOrdenadosPorCodigo() {
+        List<Paquete> ordenados = new ArrayList<>(pendientes);
+        Collections.sort(ordenados);
+        return ordenados;
+    }
+
+    public Paquete buscarPaqueteBinaria(List<Paquete> ordenados, String codigo) {
+        int posicion = busquedaBinariaRec(ordenados, codigo, 0, ordenados.size() - 1);
+        return posicion >= 0 ? ordenados.get(posicion) : null;
+    }
+
+    private int busquedaBinariaRec(List<Paquete> ordenados, String codigo, int inicio, int fin) {
+        // CASO BASE 1: rango vacío, el código no está.
+        if (inicio > fin) {
+            return -1;
+        }
+
+        int medio = inicio + (fin - inicio) / 2;
+        int comparacion = codigo.compareTo(ordenados.get(medio).getCodigo());
+
+        // CASO BASE 2: se encontró el código.
+        if (comparacion == 0) {
+            return medio;
+        }
+
+        // CASO RECURSIVO: se descarta la mitad donde no puede estar.
+        if (comparacion < 0) {
+            return busquedaBinariaRec(ordenados, codigo, inicio, medio - 1);
+        }
+        return busquedaBinariaRec(ordenados, codigo, medio + 1, fin);
     }
 
     //Metodo Divide y Venceras

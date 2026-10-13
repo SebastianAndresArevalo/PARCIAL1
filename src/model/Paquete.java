@@ -1,6 +1,22 @@
 package model;
 
-public class Paquete {
+import java.util.Comparator;
+
+public class Paquete implements Comparable<Paquete> {
+
+    public static final Comparator<Paquete> POR_PRIORIDAD_DESC =
+            Comparator.comparingInt(Paquete::getPrioridad).reversed();
+
+    public static final Comparator<Paquete> POR_PESO_DESC =
+            Comparator.comparingDouble(Paquete::getPeso).reversed();
+
+    public static final Comparator<Paquete> POR_TIEMPO_ASC =
+            Comparator.comparingInt(Paquete::getTiempoEstimado);
+
+    public static final Comparator<Paquete> ORDEN_DESPACHO =
+            POR_PRIORIDAD_DESC
+                    .thenComparing(POR_TIEMPO_ASC)
+                    .thenComparing(Comparator.naturalOrder());
 
     private final String codigo;
     private final String destino;
@@ -58,5 +74,17 @@ public class Paquete {
 
     public int getTiempoEstimado() {
         return tiempoEstimado;
+    }
+
+    @Override
+    public int compareTo(Paquete otro) {
+        return this.codigo.compareTo(otro.codigo);
+    }
+
+    @Override
+    public String toString() {
+        return codigo + " -> " + destino
+                + " (peso: " + peso + " kg, prioridad: " + prioridad
+                + ", tiempo: " + tiempoEstimado + " min)";
     }
 }

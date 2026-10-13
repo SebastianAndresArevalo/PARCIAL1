@@ -2,8 +2,9 @@ package tools;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
-public class ListaSimple<T> implements Iterable<T> {
+public class ListaSimple<T> implements Coleccion<T>, Iterable<T> {
 
     private static class Nodo<T> {
         private final T valor;
@@ -28,6 +29,7 @@ public class ListaSimple<T> implements Iterable<T> {
     /**
      * Agrega un elemento al final de la lista. Costo: O(1), gracias a la referencia al último nodo.
      */
+
     public void agregar(T elemento) {
         Nodo<T> nuevo = new Nodo<>(elemento);
         if (estaVacia()) {
@@ -51,6 +53,32 @@ public class ListaSimple<T> implements Iterable<T> {
             actual = actual.siguiente;
         }
         return actual.valor;
+    }
+
+    public boolean eliminar(T elemento) {
+        Nodo<T> anterior = null;
+        Nodo<T> actual = primero;
+
+        while (actual != null) {
+            if (Objects.equals(actual.valor, elemento)) {
+                if (anterior == null) {
+                    // Se elimina el primero (cubre también la lista de un solo elemento).
+                    primero = actual.siguiente;
+                } else {
+                    // Intermedio o último: el anterior salta al siguiente.
+                    anterior.siguiente = actual.siguiente;
+                }
+                if (actual == ultimo) {
+                    // Se eliminó el último: ultimo pasa a ser el anterior (null si quedó vacía).
+                    ultimo = anterior;
+                }
+                tamano--;
+                return true;
+            }
+            anterior = actual;
+            actual = actual.siguiente;
+        }
+        return false;
     }
 
     public int tamano() {
