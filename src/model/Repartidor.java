@@ -43,4 +43,14 @@ public class Repartidor {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+
+    @Override
+    public String toString() {
+        return "Repartidor{" +
+                "identificacion='" + identificacion + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", zona='" + zona + '\'' +
+                ", disponible=" + disponible +
+                '}';
+    }
 }
