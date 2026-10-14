@@ -9,7 +9,7 @@ public class Empresa {
 
     private final List<Paquete> pendientes = new ArrayList<>();
     private final Map<String, Paquete> paquetesPorCodigo = new HashMap<>();
-    private final Map<String, Repartidor> repartidoresPorId = new HashMap<>();
+    private final Map<String, Repartidor> repartidoresPorId = new LinkedHashMap<>();
     private final Queue<Paquete> colaLlegada = new ArrayDeque<>();
     private final Queue<Paquete> colaPrioridad = new PriorityQueue<>(Paquete.ORDEN_DESPACHO);
     private final ListaSimple<Paquete> historial = new ListaSimple<>();
@@ -117,6 +117,18 @@ public class Empresa {
         return historial.tamano();
     }
 
+    public Iterable<Paquete> historialEntregas() {
+        return historial;
+    }
+
+    public List<Paquete> obtenerPendientes() {
+        return Collections.unmodifiableList(pendientes);
+    }
+
+    public Collection<Repartidor> obtenerRepartidores() {
+        return Collections.unmodifiableCollection(repartidoresPorId.values());
+    }
+
     public double pesoTotalPorDestino(String destino) {
         return pesoTotalPorDestinoRec(pendientes, destino, 0);
     }
@@ -166,7 +178,7 @@ public class Empresa {
     }
 
     public SortedSet<String> obtenerMunicipiosOrdenados() {
-        return new TreeSet<>(municipios);
+        return Collections.unmodifiableSortedSet(municipiosOrdenados);
     }
 
     // Un repartidor no disponible no puede recibir una nueva asignación
