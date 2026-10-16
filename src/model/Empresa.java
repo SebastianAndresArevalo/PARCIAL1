@@ -121,7 +121,7 @@ public class Empresa {
         return historial.obtener(posicion);
     }
 
-    //Da el total de entregas dependiendo de cuantos datos alla en el historial
+    //Da el total de entregas dependiendo de cuantos datos allá en el historial
     public int cantidadEntregas() {
         return historial.tamano();
     }
@@ -130,6 +130,7 @@ public class Empresa {
     public Iterable<Paquete> historialEntregas() {
         return historial;
     }
+
 
     public List<Paquete> obtenerPendientes() {
         return Collections.unmodifiableList(pendientes);
@@ -262,6 +263,8 @@ public class Empresa {
         return busquedaBinariaRec(ordenados, codigo, medio + 1, fin);
     }
 
+
+    //Metodo Divide y vencerás
     public Paquete paqueteMayorPeso() {
         if (pendientes.isEmpty()) {
             return null;
