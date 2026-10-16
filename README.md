@@ -19,7 +19,7 @@ El proyecto sigue la idea central del enunciado: **ninguna estructura de datos s
 7. [Reglas de negocio y dónde se cumplen](#7-reglas-de-negocio-y-dónde-se-cumplen)
 8. [Complejidad de las operaciones](#8-complejidad-de-las-operaciones)
 9. [Datos de prueba](#9-datos-de-prueba)
-10. [Qué demuestra cada sección del Main](#10-qué-demuestra-cada-sección-del-main)
+10. [Qué demuestra cada sección del Demostracion](#10-qué-demuestra-cada-sección-del-main)
 11. [Decisiones de diseño y limitaciones conocidas](#11-decisiones-de-diseño-y-limitaciones-conocidas)
 12. [Documentación complementaria](#12-documentación-complementaria)
 13. [Uso de inteligencia artificial](#13-uso-de-inteligencia-artificial)
@@ -34,7 +34,7 @@ PARCIAL1/
 ├── README.md                  ← este archivo
 ├── .gitignore
 └── src/
-    ├── Main.java              ← demostración ejecutable de todas las operaciones
+    ├── Demostracion.java              ← demostración ejecutable de todas las operaciones
     ├── model/
     │   ├── Paquete.java       ← entidad Paquete (Comparable + Comparators)
     │   ├── Repartidor.java    ← entidad Repartidor
@@ -46,7 +46,7 @@ PARCIAL1/
 
 | Paquete | Responsabilidad |
 |---|---|
-| *(raíz)* `Main` | Carga los datos iniciales y ejecuta 11 secciones de demostración. |
+| *(raíz)* `Demostracion` | Carga los datos iniciales y ejecuta 11 secciones de demostración. |
 | `model` | Clases del dominio y la lógica del sistema (`Paquete`, `Repartidor`, `Empresa`). |
 | `tools` | Estructura de datos propia, reutilizable y sin dependencia del dominio (`Coleccion<T>`, `ListaSimple<T>`). |
 
@@ -65,7 +65,7 @@ La separación es intencional: `tools` no conoce a `Paquete`; la lista propia si
 
 1. Abrir la carpeta del proyecto (`File → Open`).
 2. Verificar que `src` esté marcada como *Sources Root*.
-3. Ejecutar la clase `Main` (`Shift + F10`).
+3. Ejecutar la clase `Demostracion` (`Shift + F10`).
 
 ### Ejecución desde la terminal
 
@@ -76,17 +76,17 @@ Desde la raíz del repositorio:
 ```bash
 find src -name "*.java" > sources.txt
 javac -encoding UTF-8 -d out @sources.txt
-java -Dfile.encoding=UTF-8 -cp out Main
+java -Dfile.encoding=UTF-8 -cp out Demostracion
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
 javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -Dfile.encoding=UTF-8 -cp out Main
+java -Dfile.encoding=UTF-8 -cp out Demostracion
 ```
 
-> `Main` está en el paquete por defecto, por eso se invoca como `Main` y no con un nombre calificado. El indicador `-Dfile.encoding=UTF-8` evita que las tildes (Calarcá, Ramírez) se vean mal en consola.
+> `Demostracion` está en el paquete por defecto, por eso se invoca como `Demostracion` y no con un nombre calificado. El indicador `-Dfile.encoding=UTF-8` evita que las tildes (Calarcá, Ramírez) se vean mal en consola.
 
 La ejecución termina con código `0` y no pide datos al usuario: es una demostración automática.
 
@@ -96,7 +96,7 @@ La ejecución termina con código `0` y no pide datos al usuario: es una demostr
 
 ```
                          ┌───────────────┐
-                         │     Main      │  demostración
+                         │     Demostracion      │  demostración
                          └───────┬───────┘
                                  │ usa
                          ┌───────▼───────┐
@@ -319,7 +319,7 @@ Si todo es válido, registra la asignación y marca al repartidor como no dispon
 
 ## 9. Datos de prueba
 
-Definidos directamente en `Main` (sin archivos ni bases de datos), cumpliendo los mínimos del enunciado:
+Definidos directamente en `Demostracion` (sin archivos ni bases de datos), cumpliendo los mínimos del enunciado:
 
 | Requisito | Cumplimiento |
 |---|---|
@@ -330,11 +330,11 @@ Definidos directamente en `Main` (sin archivos ni bases de datos), cumpliendo lo
 | Códigos no consecutivos | `PQ731`, `PQ105`, `PQ942`, `PQ318`, `PQ061`, `PQ977`… |
 | Varios paquetes al mismo municipio | Armenia concentra 8; Salento y Calarcá, 5 cada uno |
 
-Además, `Main` crea pequeñas instancias de `Empresa` para reproducir **los ejemplos exactos del enunciado** (peso de Armenia = 14,0 kg; prioridad ≥ 4 = 4 paquetes; orden de llegada y orden de despacho).
+Además, `Demostracion` crea pequeñas instancias de `Empresa` para reproducir **los ejemplos exactos del enunciado** (peso de Armenia = 14,0 kg; prioridad ≥ 4 = 4 paquetes; orden de llegada y orden de despacho).
 
 ---
 
-## 10. Qué demuestra cada sección del Main
+## 10. Qué demuestra cada sección del Demostracion
 
 | # | Sección | Qué se demuestra |
 |---|---|---|

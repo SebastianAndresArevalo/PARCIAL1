@@ -10,27 +10,30 @@ public class Empresa {
     private final List<Paquete> pendientes = new ArrayList<>();
     private final Map<String, Paquete> paquetesPorCodigo = new HashMap<>();
     private final Map<String, Repartidor> repartidoresPorId = new LinkedHashMap<>();
+    private final Map<String, List<Paquete>> paquetesPorMunicipio = new LinkedHashMap<>();
+    private final Map<String, Repartidor> asignaciones = new LinkedHashMap<>();
     private final Queue<Paquete> colaLlegada = new ArrayDeque<>();
     private final Queue<Paquete> colaPrioridad = new PriorityQueue<>(Paquete.ORDEN_DESPACHO);
     private final ListaSimple<Paquete> historial = new ListaSimple<>();
     private final Set<String> municipios = new LinkedHashSet<>();
-    private final Map<String, List<Paquete>> paquetesPorMunicipio = new LinkedHashMap<>();
-    private final Map<String, Repartidor> asignaciones = new LinkedHashMap<>();
     private final SortedSet<String> municipiosOrdenados = new TreeSet<>();
 
 
-    //Validación de códigos e identificaciones únicas;
+    //Busca un paquete por su "llave", ya que se trata de un HashMap
     public boolean existePaquete(String codigo) {
         return paquetesPorCodigo.containsKey(codigo);
     }
 
+    //Busca un repartidor por su "llave", ya que se trata de un LinkedHashMap, este sale en el orden registrado
     public boolean existeRepartidor(String identificacion) {
         return repartidoresPorId.containsKey(identificacion);
     }
 
 
-    //Registro y consulta de Paquetes
+    //Registro de paquetes
     public void registrarPaquete(Paquete paquete) {
+
+        //Verifica que el paquete no sea null y que no exista previamente
         if (paquete == null) {
             throw new IllegalArgumentException("El paquete no puede ser nulo.");
         }
@@ -48,14 +51,17 @@ public class Empresa {
         paquetesPorMunicipio.computeIfAbsent(paquete.getDestino(), k -> new ArrayList<>()).add(paquete);
     }
 
+    //Entrega los datos del paquete que tiene el codigo requerido
     public Paquete consultarPaquete(String codigo) {
         return paquetesPorCodigo.get(codigo);
     }
 
+    //Permite visualizar los municipios existentes sin permitir ninguna modificación
     public Set<String> obtenerMunicipios() {
         return Collections.unmodifiableSet(municipios);
     }
 
+    //Permite visualizar los paquetes dependiendo del municipio, si hay datos existentes, no deja modificarlos
     public List<Paquete> consultarPaquetesPorMunicipio(String municipio) {
         List<Paquete> paquetes = paquetesPorMunicipio.get(municipio);
         if (paquetes == null) {
@@ -63,6 +69,7 @@ public class Empresa {
         }
         return Collections.unmodifiableList(paquetes);
     }
+
 
     public Map<String, List<Paquete>> obtenerPaquetesPorMunicipio() {
         return Collections.unmodifiableMap(paquetesPorMunicipio);
@@ -109,14 +116,17 @@ public class Empresa {
         }
     }
 
+    //Verifica una entrega ya realizada
     public Paquete obtenerEntrega(int posicion) {
         return historial.obtener(posicion);
     }
 
+    //Da el total de entregas dependiendo de cuantos datos alla en el historial
     public int cantidadEntregas() {
         return historial.tamano();
     }
 
+    //Muestra el historial de entregas
     public Iterable<Paquete> historialEntregas() {
         return historial;
     }

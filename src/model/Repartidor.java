@@ -8,6 +8,8 @@ public class Repartidor {
     private boolean disponible;
 
     public Repartidor(String identificacion, String nombre, String zona, boolean disponible) {
+
+        //Verifica que los datos a ingresar existan, lanzando un mensaje si se deja en blanco el espacio
         if (identificacion == null || identificacion.isBlank()) {
             throw new IllegalArgumentException("La identificación no puede ser nula ni vacía.");
         }

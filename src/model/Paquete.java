@@ -4,15 +4,19 @@ import java.util.Comparator;
 
 public class Paquete implements Comparable<Paquete> {
 
+    //Compara datos por prioridad de forma desciéndete gracias al reversed
     public static final Comparator<Paquete> POR_PRIORIDAD_DESC =
             Comparator.comparingInt(Paquete::getPrioridad).reversed();
 
+    //Compara datos por Peso de forma desciéndete gracias al reversed
     public static final Comparator<Paquete> POR_PESO_DESC =
             Comparator.comparingDouble(Paquete::getPeso).reversed();
 
+    //Compara datos por tiempo estimado de forma ascendente
     public static final Comparator<Paquete> POR_TIEMPO_ASC =
             Comparator.comparingInt(Paquete::getTiempoEstimado);
 
+    //Metodo que nos dice que si hay empate en la prioridad, se decida por orden natural
     public static final Comparator<Paquete> ORDEN_DESPACHO =
             POR_PRIORIDAD_DESC
                     .thenComparing(POR_TIEMPO_ASC)
@@ -26,6 +30,7 @@ public class Paquete implements Comparable<Paquete> {
 
     public Paquete(String codigo, String destino, double peso, int prioridad, int tiempoEstimado) {
 
+        //Código no puede ser vacío
         if (codigo == null || codigo.isBlank()) {
             throw new IllegalArgumentException("El código no puede ser nulo ni vacío.");
         }
@@ -35,6 +40,7 @@ public class Paquete implements Comparable<Paquete> {
             throw new IllegalArgumentException("El destino no puede ser nulo ni vacío.");
         }
 
+        //peso no puede ser menor a 0
         if (peso <= 0) {
             throw new IllegalArgumentException("El peso debe ser mayor que cero.");
         }
