@@ -26,10 +26,6 @@ public class ListaSimple<T> implements Coleccion<T>, Iterable<T> {
         tamano = 0;
     }
 
-    /**
-     * Agrega un elemento al final de la lista. Costo: O(1), gracias a la referencia al último nodo.
-     */
-
     public void agregar(T elemento) {
         Nodo<T> nuevo = new Nodo<>(elemento);
         if (estaVacia()) {
@@ -41,9 +37,6 @@ public class ListaSimple<T> implements Coleccion<T>, Iterable<T> {
         tamano++;
     }
 
-    /**
-     * Devuelve el elemento en la posición indicada (la primera posición es 0). Costo: O(n).
-     */
     public T obtener(int posicion) {
         if (posicion < 0 || posicion >= tamano) {
             throw new IndexOutOfBoundsException("Posición inválida: " + posicion);

@@ -234,7 +234,7 @@ public class Empresa {
     }
 
     private int busquedaBinariaRec(List<Paquete> ordenados, String codigo, int inicio, int fin) {
-        // CASO BASE 1: rango vacío, el código no está.
+
         if (inicio > fin) {
             return -1;
         }
@@ -242,19 +242,16 @@ public class Empresa {
         int medio = inicio + (fin - inicio) / 2;
         int comparacion = codigo.compareTo(ordenados.get(medio).getCodigo());
 
-        // CASO BASE 2: se encontró el código.
         if (comparacion == 0) {
             return medio;
         }
 
-        // CASO RECURSIVO: se descarta la mitad donde no puede estar.
         if (comparacion < 0) {
             return busquedaBinariaRec(ordenados, codigo, inicio, medio - 1);
         }
         return busquedaBinariaRec(ordenados, codigo, medio + 1, fin);
     }
 
-    //Metodo Divide y Venceras
     public Paquete paqueteMayorPeso() {
         if (pendientes.isEmpty()) {
             return null;
@@ -262,24 +259,18 @@ public class Empresa {
         return mayorPesoDivideYVencerasRec(pendientes, 0, pendientes.size() - 1);
     }
 
-    // Trabaja sobre el rango [inicio, fin], ambos incluidos.
     private Paquete mayorPesoDivideYVencerasRec(List<Paquete> paquetes, int inicio, int fin) {
-        // CASO BASE: un solo paquete, que es el mayor de su rango.
+
         if (inicio == fin) {
             return paquetes.get(inicio);
         }
 
-        // DIVISIÓN: se parte el rango en dos mitades.
         int medio = inicio + (fin - inicio) / 2;
 
-        // SUBPROBLEMA IZQUIERDO: mayor de la primera mitad.
         Paquete mayorIzquierdo = mayorPesoDivideYVencerasRec(paquetes, inicio, medio);
 
-        // SUBPROBLEMA DERECHO: mayor de la segunda mitad.
         Paquete mayorDerecho = mayorPesoDivideYVencerasRec(paquetes, medio + 1, fin);
 
-        // COMBINACIÓN: el mayor del rango completo es el mayor de los dos resultados parciales.
-        // Si empatan, se conserva el que se registró primero (el de la izquierda).
         return mayorIzquierdo.getPeso() >= mayorDerecho.getPeso() ? mayorIzquierdo : mayorDerecho;
     }
 }
